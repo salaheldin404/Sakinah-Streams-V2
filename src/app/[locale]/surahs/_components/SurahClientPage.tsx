@@ -1,7 +1,7 @@
 "use client";
 
 // React and Next.js imports
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -23,7 +23,6 @@ import { useGetVersesChapterQuery } from "@/lib/store/features/versesApi";
 import { setGoToVerse, setLastRead } from "@/lib/store/slices/surah-slice";
 
 // Utility, Data, and Type imports
-import { groupVersesByPage } from "@/lib/utils/verse";
 import { Verse } from "@/types/verse";
 import SurahTopBar from "@/components/surah/SurahTopBar";
 import useSurahNavigation from "@/hooks/useSurahNavigation";
@@ -40,6 +39,19 @@ interface SurahClientPageProps {
   locale: "en" | "ar";
 }
 
+function processVerses(verses: Verse[] = []) {
+  const grouped: Record<string, Verse[]> = {};
+  const versePageMap = new Map<string, number>();
+
+  for (const verse of verses) {
+    const page = String(verse.page_number);
+    (grouped[page] ??= []).push(verse);
+    versePageMap.set(verse.verse_key, verse.page_number);
+  }
+
+  return { grouped, pages: Object.keys(grouped).map(Number), versePageMap };
+}
+
 const SurahClientPage = ({ initialSurah, locale }: SurahClientPageProps) => {
   const surah = initialSurah;
   const id = surah.number.toString();
@@ -48,14 +60,18 @@ const SurahClientPage = ({ initialSurah, locale }: SurahClientPageProps) => {
   const { currentVerseLocation, lastRead } = useAppSelector(
     (state) => state.surah,
   );
+  const syncStatus = useAppSelector((state) => state.sync.status);
+
   const user = useAppSelector((state) => state.sync.user);
   const dispatch = useAppDispatch();
   const t = useTranslations("Surah");
   const t2 = useTranslations("SurahPage");
-  const [groupedVerses, setGroupedVerses] = useState<Record<number, Verse[]>>(
-    {},
-  );
 
+  const hasRestoredScrollRef = useRef(false);
+  const initialLastReadRef = useRef(lastRead);
+  const prevVerseQueryRef = useRef<string | null>(null);
+  const pendingSaveLastReadRef = useRef<typeof lastRead | null>(null);
+  const isWaitingForSyncRef = useRef(false);
   const numericId = Number(id);
 
   const [activeTab, setActiveTab] = useState("reading");
@@ -84,11 +100,12 @@ const SurahClientPage = ({ initialSurah, locale }: SurahClientPageProps) => {
   );
   const { handleNextSurah, handlePreviousSurah, navigationState } =
     useSurahNavigation(numericId);
+  const {
+    grouped: groupedVerses,
+    pages: readingPages,
+    versePageMap,
+  } = useMemo(() => processVerses(versesData?.verses), [versesData?.verses]);
 
-  const readingPages = useMemo(
-    () => Object.keys(groupedVerses).map(Number),
-    [groupedVerses],
-  );
   const { trackCurrentPage } = useQuranActivityTracker({
     user,
     readingPages,
@@ -120,20 +137,33 @@ const SurahClientPage = ({ initialSurah, locale }: SurahClientPageProps) => {
   const isCurrentPageSaved =
     Number(lastRead?.chapter_id) === numericId &&
     Number(lastRead?.page_number) === Number(currentReaderPage);
-  const currentReaderPageLabel = currentReaderPage
-    ? locale === "ar"
-      ? toArabicNumber(Number(currentReaderPage))
-      : currentReaderPage
-    : "-";
-  const selectedReaderLabel =
-    locale === "ar"
-      ? toArabicNumber(selectedPageIndex + 1)
-      : String(selectedPageIndex + 1);
-  const totalReaderLabel =
-    locale === "ar" ? toArabicNumber(readingPages.length) : readingPages.length;
+
+  const { currentReaderPageLabel, selectedReaderLabel, totalReaderLabel } =
+    useMemo(() => {
+      return {
+        currentReaderPageLabel: currentReaderPage
+          ? locale === "ar"
+            ? toArabicNumber(Number(currentReaderPage))
+            : currentReaderPage
+          : "-",
+
+        selectedReaderLabel:
+          locale === "ar"
+            ? toArabicNumber(selectedPageIndex + 1)
+            : String(selectedPageIndex + 1),
+
+        totalReaderLabel:
+          locale === "ar"
+            ? toArabicNumber(readingPages.length)
+            : String(readingPages.length),
+      };
+    }, [locale, currentReaderPage, selectedPageIndex, readingPages.length]);
 
   const handleSaveMark = useCallback(() => {
     if (!currentPageAnchorVerse) return;
+
+    pendingSaveLastReadRef.current = lastRead;
+    isWaitingForSyncRef.current = true;
 
     dispatch(setGoToVerse(null));
     dispatch(
@@ -145,24 +175,37 @@ const SurahClientPage = ({ initialSurah, locale }: SurahClientPageProps) => {
         verse_key: currentPageAnchorVerse.verse_key,
       }),
     );
-    toast.success(`${t2("marked-saved")}`);
-  }, [currentPageAnchorVerse, dispatch, t2]);
 
-  // Memoize bismillah condition
-  const showBismillah = useMemo(
-    () => surah?.number !== 1 && surah?.number !== 9,
-    [surah?.number],
-  );
+    toast.success(t2("marked-saved"), {
+      action: {
+        label: t2("undo") || "Undo",
+        onClick: () => {
+          dispatch(setLastRead(pendingSaveLastReadRef.current));
+          isWaitingForSyncRef.current = false;
+        },
+      },
+    });
+  }, [currentPageAnchorVerse, dispatch, lastRead, t2]);
+  // Handle sync errors specifically for saving marks (automatic rollback)
+  useEffect(() => {
+    if (!isWaitingForSyncRef.current) return;
+
+    if (syncStatus === "error") {
+      dispatch(setLastRead(pendingSaveLastReadRef.current));
+      toast.error(
+        t2("sync-error-undo") ||
+          "Sync failed. Bookmark reverted to keep your data consistent.",
+        { duration: 5000 },
+      );
+      isWaitingForSyncRef.current = false;
+    } else if (syncStatus === "synced") {
+      isWaitingForSyncRef.current = false;
+    }
+  }, [syncStatus, dispatch, t2]);
+
+  const showBismillah = surah?.number !== 1 && surah?.number !== 9;
 
   // useScrollToLastRead({ lastRead, isFetching, verseQuery });
-
-  useEffect(() => {
-    if (versesData) {
-      const grouped = groupVersesByPage(versesData.verses);
-
-      setGroupedVerses(grouped);
-    }
-  }, [versesData]);
 
   useEffect(() => {
     if (verseQuery) {
@@ -173,33 +216,42 @@ const SurahClientPage = ({ initialSurah, locale }: SurahClientPageProps) => {
   }, [verseQuery, dispatch, id]);
 
   useEffect(() => {
-    if (!readingCarouselApi || !readingPages.length) return;
+    if (
+      !readingCarouselApi ||
+      !readingPages.length ||
+      hasRestoredScrollRef.current
+    )
+      return;
 
-    const targetPage = verseQuery
-      ? versesData?.verses?.find(
-          (verse: Verse) => verse.verse_key === `${id}:${verseQuery}`,
-        )?.page_number
-      : lastRead?.chapter_id === numericId
-        ? lastRead.page_number
+    const initialLastRead = initialLastReadRef.current;
+    if (!initialLastRead) {
+      hasRestoredScrollRef.current = true;
+      return;
+    }
+    if (initialLastRead.chapter_id !== numericId) {
+      hasRestoredScrollRef.current = true;
+      return;
+    }
+
+    const targetIndex = readingPages.indexOf(initialLastRead.page_number);
+    if (targetIndex >= 0) readingCarouselApi.scrollTo(targetIndex, true);
+  }, [id, numericId, readingCarouselApi, readingPages, versePageMap]);
+
+  useEffect(() => {
+    if (!readingCarouselApi || !readingPages.length) return;
+    const hasVerseQueryChanged = verseQuery !== prevVerseQueryRef.current;
+
+    prevVerseQueryRef.current = verseQuery;
+    const targetPage =
+      verseQuery && hasVerseQueryChanged
+        ? (versePageMap.get(`${id}:${verseQuery}`) ?? null)
         : null;
 
-    if (!targetPage) return;
+    if (targetPage === null) return;
 
-    const targetIndex = readingPages.indexOf(Number(targetPage));
-    if (targetIndex >= 0) {
-      readingCarouselApi.scrollTo(targetIndex, true);
-    }
-  }, [
-    id,
-    lastRead,
-    numericId,
-    readingCarouselApi,
-    readingPages,
-    verseQuery,
-    versesData?.verses,
-  ]);
-
-
+    const targetIndex = readingPages.indexOf(targetPage);
+    if (targetIndex >= 0) readingCarouselApi.scrollTo(targetIndex, true);
+  }, [readingCarouselApi, verseQuery, id, readingPages, versePageMap]);
   if (!surah) {
     return (
       <div className="text-center py-10 space-y-3">
