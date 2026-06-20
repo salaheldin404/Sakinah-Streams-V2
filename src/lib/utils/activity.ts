@@ -235,6 +235,10 @@ export function calculateJourneyStats(
   >();
 
   activities.forEach((activity) => {
+    if (activity.type !== "QURAN") {
+      return;
+    }
+
     const {
       date,
       pagesRead,
@@ -244,7 +248,6 @@ export function calculateJourneyStats(
     } = activity;
 
     const normalizedDate = DateTime.fromISO(date).toISODate() ?? date;
-
     activityDates.add(normalizedDate);
     totalPagesRead += pagesRead;
 
@@ -263,7 +266,9 @@ export function calculateJourneyStats(
 
     heatmapByDate.set(normalizedDate, existing);
 
-    ranges?.forEach((range) => {
+    // Ensure ranges is an array before calling forEach
+    const rangesArray = Array.isArray(ranges) ? ranges : [];
+    rangesArray.forEach((range) => {
       const surahId = Number(range.split(":")[0]);
 
       if (Number.isNaN(surahId)) {

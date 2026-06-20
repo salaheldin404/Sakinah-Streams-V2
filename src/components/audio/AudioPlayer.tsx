@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/popover";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { LuUser, LuX } from "react-icons/lu";
+import { LuSettings, LuUser, LuX } from "react-icons/lu";
 
 // import { MdPlaylistPlay } from "react-icons/md";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
@@ -62,7 +62,9 @@ const AudioPlayer = memo(
     const [isReciterChanging, setIsReciterChanging] = useState(false);
     const savedVerseRef = useRef<VerseTiming | null>(null);
     const pendingSeekRef = useRef<VerseTiming | null>(null); // New ref for pending seek operations
-
+    const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
     const {
       reciter,
       isOpen,
@@ -255,23 +257,30 @@ const AudioPlayer = memo(
         pendingSeekRef.current = null;
       }
     }, [timestampsMap, duration, performSeek, dispatch]);
-    // useEffect(() => {
-    //   const reciterInNewLanguage = reciters?.find((r) => r.id === reciter.id);
-    //   const newName = reciterInNewLanguage?.translated_name.name;
-
-    //   // If the name for the current reciter ID in the new language is different,
-    //   // update it in Redux. This will trigger a reload, but we save the time first.
-    //   if (newName && newName !== reciter.name) {
-    //     dispatch(setReciter({ id: reciter.id, name: newName }));
-    //   }
-    // }, [reciters, reciter.id, reciter.name, dispatch]);
 
     useEffect(() => {
       if (audioRef.current) {
         audioRef.current.volume = volume;
       }
     }, [audioRef, volume]);
+    useEffect(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
 
+      const handleRateChange = () => {
+        if (audio.playbackRate !== playbackSpeed) {
+          audio.playbackRate = playbackSpeed;
+        }
+      };
+
+      // Apply initial speed
+      audio.playbackRate = playbackSpeed;
+
+      audio.addEventListener("ratechange", handleRateChange);
+      return () => {
+        audio.removeEventListener("ratechange", handleRateChange);
+      };
+    }, [playbackSpeed, audioRef]);
     useEffect(() => {
       if (
         !isSeeking &&
@@ -439,7 +448,7 @@ const AudioPlayer = memo(
               </p>
             </div>
           </div>
-          <div className="md:basis-1/2 flex justify-center items-center space-x-2 md:space-x-4">
+          <div className="md:basis-1/2 flex justify-center items-center space-x-1 md:space-x-4">
             {/* {locale === "ar" ? <SkipForwardButton /> : <SkipBackButton />} */}
 
             <PlayButton
@@ -458,10 +467,10 @@ const AudioPlayer = memo(
               <LuX className="w-5 h-5" />
             </Button>
           </div>
-          <div className=" md:basis-[25%]  flex items-center space-x-2 md:space-x-3">
+          <div className=" md:basis-[25%]  flex items-center space-x-1 md:space-x-3">
             <Popover open={reciterListOpen} onOpenChange={setReciterListOpen}>
-              <PopoverTrigger className="cursor-pointer p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-secondary transition-colors">
-                <LuUser className="w-5 h-5" />
+              <PopoverTrigger className="cursor-pointer p-1 md:p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-secondary transition-colors">
+                <LuUser className="w-4 h-4 md:w-5 md:h-5" />
               </PopoverTrigger>
               <PopoverContent className="w-80 h-80 overflow-y-auto space-y-2">
                 {reciterList}
@@ -473,6 +482,40 @@ const AudioPlayer = memo(
               VolumeIcon={VolumeIcon}
               handleVolumeChange={handleVolumeChange}
             />
+            <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="cursor-pointer p-1 md:p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-secondary transition-colors"
+                  title={locale === "ar" ? "الإعدادات" : "Settings"}
+                >
+                  <LuSettings className="w-4 h-4 md:w-5 md:h-5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-4 space-y-4" align="end">
+                {/* Speed Control Section */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                    {t("speed")}
+                  </h4>
+                  <div className="grid grid-cols-3 gap-1.5 bg-muted p-1 rounded-lg">
+                    {speeds.map((speed) => (
+                      <button
+                        key={speed}
+                        className={`py-1.5 text-[11px] font-medium rounded-md cursor-pointer transition-colors text-center ${
+                          playbackSpeed === speed
+                            ? "bg-background text-foreground font-semibold shadow-sm"
+                            : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+                        }`}
+                        onClick={() => setPlaybackSpeed(speed)}
+                      >
+                        {speed === 1.0 ? `1.0x` : `${speed}x`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
             {/* <Popover>
               <PopoverTrigger className="cursor-pointer p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-secondary transition-colors">
                 <MdPlaylistPlay className="w-5 h-5" />

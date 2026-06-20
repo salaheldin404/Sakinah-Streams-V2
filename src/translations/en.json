@@ -66,7 +66,9 @@
     "marked-saved": "Marked has been saved for this page",
     "juz": "Juz",
     "page": "Page",
-    "hizb": "Hizb"
+    "hizb": "Hizb",
+    "undo": "Undo",
+    "sync-error-undo": "Failed to save mark. Your previous mark has been restored."
   },
   "RandomAyah": {
     "title": "Ayah of the Moment",
@@ -160,7 +162,8 @@
     "removed-from-wishlist": "Removed from wishlist"
   },
   "AudioPlayer": {
-    "audio-player-error": "Unfortunately, we were unable to play the audio clip. Please try another reader."
+    "audio-player-error": "Unfortunately, we were unable to play the audio clip. Please try another reader.",
+    "speed": "Speed"
   },
   "RadioPlayer": {
     "radio-player-error": "Unfortunately, we were unable to play the audio clip. Please try another station."
@@ -241,7 +244,7 @@
     "pending": "{count} changes pending",
     "syncing": "Syncing...",
     "synced": "All changes saved",
-    "error": "Sync failed",
+    "error": "Sync failed - please try again",
     "offline": "Offline",
     "errorOccurred": "Sync Error",
     "lastSynced": "Last synced"
@@ -553,7 +556,7 @@
 
       "pages604": "Keeper of Light",
       "pages604Desc": "Read 604 pages in total",
-      
+
       "khatma1": "First Khatma",
       "khatma1Desc": "Complete your first full Quran Khatma",
 

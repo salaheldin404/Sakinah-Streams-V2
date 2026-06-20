@@ -216,8 +216,8 @@ export default async function RootLayout({
                 : null
             }
           >
-            <SettingsHydrator>
-              <NextIntlClientProvider locale={locale}>
+            <NextIntlClientProvider locale={locale}>
+              <SettingsHydrator>
                 <LanguageRouteSync />
                 <Navbar />
                 {children}
@@ -225,8 +225,8 @@ export default async function RootLayout({
                 {khatma}
                 <PWAInstallPrompt />
                 <PlayerWrapper />
-              </NextIntlClientProvider>
-            </SettingsHydrator>
+              </SettingsHydrator>
+            </NextIntlClientProvider>
           </StoreProvider>
           <Toaster richColors />
         </ThemeProvider>

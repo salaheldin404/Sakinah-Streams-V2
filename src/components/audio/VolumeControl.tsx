@@ -22,7 +22,7 @@ const VolumeControl = ({
     <div>
       <div className="lg:hidden">
         <Popover modal>
-          <PopoverTrigger className="cursor-pointer p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+          <PopoverTrigger className="cursor-pointer p-1 md:p-2 rounded-full text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
             <VolumeIcon className="w-5 h-5 " />
           </PopoverTrigger>
           <PopoverContent className="">
