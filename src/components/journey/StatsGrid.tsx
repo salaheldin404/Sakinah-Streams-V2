@@ -21,7 +21,7 @@ export function StatsGrid({ stats }: StatsGridProps) {
     }
     return `${minutes}${t("minutes")}`;
   };
-
+  console.log(stats,'stats')
   const items = [
     {
       label: t("totalPages"),
