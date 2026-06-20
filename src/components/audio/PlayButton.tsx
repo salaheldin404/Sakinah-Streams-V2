@@ -13,7 +13,7 @@ const PlayButton = memo(
     return (
       <Button
         onClick={handleTogglePlay}
-        className="cursor-pointer w-10 h-10 rounded-full gradient-purple text-white shadow-md hover:bg-primary/90 transition-transform transform hover:scale-105"
+        className="cursor-pointer w-8 h-8 md:w-10 md:h-10 rounded-full gradient-purple text-white shadow-md hover:bg-primary/90 transition-transform transform hover:scale-105"
       >
         {isPlaying && <LuPause className="w-6 h-6" />}
         {!isPlaying && !isLoading && <LuPlay className="w-6 h-6" />}
