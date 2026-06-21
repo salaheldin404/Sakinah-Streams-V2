@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, Trash2, Loader2 } from "lucide-react";
 import { ReflectionResponse } from "@/types/reflection";
-import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useDeleteReflectionMutation } from "@/lib/store/features/reflectionApi";
 
 interface HistoryItem {
   id: string;
@@ -28,39 +28,26 @@ interface HistoryItem {
 
 interface ReflectionHistoryCardProps {
   onSelect: (data: ReflectionResponse) => void;
-  onDelete: (id: string) => void;
   item: HistoryItem;
 }
 
 const ReflectionHistoryCard = ({
   item,
   onSelect,
-  onDelete,
 }: ReflectionHistoryCardProps) => {
   const t = useTranslations("reflection");
   const locale = useLocale();
-  const [isDeleting, setIsDeleting] = useState(false);
-
+  const [deleteReflection, { isLoading: isDeleting }] =
+    useDeleteReflectionMutation();
   const onConfirmDelete = async () => {
     if (isDeleting) return;
 
-    setIsDeleting(true);
     try {
-      const response = await fetch("/api/ai/reflection", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: item.id }),
-      });
-
-      if (!response.ok) throw new Error("Failed to delete");
-
+      await deleteReflection(item.id).unwrap();
       toast.success(t("delete_success"));
-      onDelete(item.id);
     } catch (error) {
       console.error(error);
       toast.error(t("delete_error"));
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -100,13 +87,17 @@ const ReflectionHistoryCard = ({
               </AlertDialogTrigger>
               <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>{t("delete_confirm_title")}</AlertDialogTitle>
+                  <AlertDialogTitle>
+                    {t("delete_confirm_title")}
+                  </AlertDialogTitle>
                   <AlertDialogDescription>
                     {t("delete_confirm_description")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>{t("delete_confirm_cancel")}</AlertDialogCancel>
+                  <AlertDialogCancel>
+                    {t("delete_confirm_cancel")}
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={onConfirmDelete}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

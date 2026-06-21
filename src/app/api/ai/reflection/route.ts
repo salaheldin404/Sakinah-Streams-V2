@@ -76,7 +76,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       take: 12,
     });
-
+    
     return NextResponse.json(logs);
   } catch (error: unknown) {
     if (isUnauthorizedError(error)) {

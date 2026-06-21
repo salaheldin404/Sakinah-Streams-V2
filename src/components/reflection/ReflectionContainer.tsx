@@ -8,35 +8,25 @@ import ReflectionResults from "./ReflectionResults";
 import ReflectionHistory from "./ReflectionHistory";
 import { ReflectionResponse, EmotionTag } from "@/types/reflection";
 import { toast } from "sonner";
+import { useCreateReflectionMutation } from "@/lib/store/features/reflectionApi";
 
 export default function ReflectionContainer() {
   const [step, setStep] = useState<"input" | "loading" | "results">("input");
   const [reflectionData, setReflectionData] =
     useState<ReflectionResponse | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [createReflection] = useCreateReflectionMutation();
 
+  
   const handleSubmit = async (data: {
     userInput?: string;
     emotionTag?: EmotionTag;
   }) => {
     setStep("loading");
     try {
-      const response = await fetch("/api/ai/reflection", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          result.error || "Failed to generate reflection. Please try again.",
-        );
-      }
+      const result = await createReflection(data).unwrap();
 
       setReflectionData(result);
       setStep("results");
-      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
@@ -70,7 +60,6 @@ export default function ReflectionContainer() {
             <EmotionInput onSubmit={handleSubmit} isLoading={false} />
             <ReflectionHistory
               onSelect={handleSelectFromHistory}
-              refreshTrigger={refreshTrigger}
             />
           </motion.div>
         )}

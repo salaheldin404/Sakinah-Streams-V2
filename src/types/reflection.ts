@@ -46,3 +46,12 @@ export interface EmotionLogEntry {
   aiResponse: ReflectionResponse;
   createdAt: Date;
 }
+
+
+export interface HistoryItem {
+  id: string;
+  emotionTag: string;
+  userInput: string | null;
+  aiResponse: ReflectionResponse;
+  createdAt: string;
+}

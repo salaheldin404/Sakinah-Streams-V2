@@ -1,60 +1,26 @@
 "use client";
 
-import {  useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { History } from "lucide-react";
 import { ReflectionResponse } from "@/types/reflection";
 import ReflectionHistoryCard from "./ReflectionHistoryCard";
-
-interface HistoryItem {
-  id: string;
-  emotionTag: string;
-  userInput: string | null;
-  aiResponse: ReflectionResponse;
-  createdAt: string;
-}
+import { useGetReflectionsQuery } from "@/lib/store/features/reflectionApi";
 
 interface ReflectionHistoryProps {
   onSelect: (data: ReflectionResponse) => void;
-  refreshTrigger: number;
 }
 
 export default function ReflectionHistory({
   onSelect,
-  refreshTrigger,
 }: ReflectionHistoryProps) {
   const t = useTranslations("reflection");
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, isLoading: isGetReflectionsLoading } = useGetReflectionsQuery();
 
-  const fetchHistory = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/ai/reflection");
-      if (response.ok) {
-        const data = await response.json();
-        setHistory(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch history:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchHistory();
-  }, [refreshTrigger, fetchHistory]);
-
-  const handleDelete = useCallback((id: string) => {
-    setHistory((prev) => prev.filter((item) => item.id !== id));
-  },[]);
-
-  if (isLoading) {
+  if (isGetReflectionsLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-        {[1, 2, 3,4].map((i) => (
+        {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
             className="min-w-[280px] h-32 rounded-2xl bg-card/50 animate-pulse"
@@ -63,7 +29,7 @@ export default function ReflectionHistory({
       </div>
     );
   }
-  if (history.length === 0) return null;
+  if (data?.length === 0) return null;
 
   return (
     <div className="space-y-4">
@@ -75,12 +41,11 @@ export default function ReflectionHistory({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-        {history.map((item) => (
+        {data?.map((item) => (
           <ReflectionHistoryCard
             key={item.id}
             item={item}
             onSelect={onSelect}
-            onDelete={handleDelete}
           />
         ))}
       </div>
