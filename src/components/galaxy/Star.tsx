@@ -1,6 +1,6 @@
 import { GalaxySurah, Point } from "@/types/galaxy";
 import { motion } from "framer-motion";
-import { CSSProperties, memo, useMemo } from "react";
+import { CSSProperties, memo, useMemo, useState } from "react";
 
 interface StarProps {
   surah: GalaxySurah;
@@ -50,6 +50,7 @@ const Star = memo(
     isMobile,
     isArabic,
   }: StarProps) => {
+    const [isHovered, setIsHovered] = useState(false);
     const size = isMobile ? 10 : 15;
 
     const positionStyle = useMemo<CSSProperties>(
@@ -121,6 +122,8 @@ const Star = memo(
         variants={BUTTON_VARIANTS}
         whileHover={isMobile ? undefined : "hovered"}
         whileTap={STAR_WHILE_TAP}
+        onHoverStart={isMobile ? undefined : () => setIsHovered(true)}
+        onHoverEnd={isMobile ? undefined : () => setIsHovered(false)}
       >
         {/* Glow — opacity driven by inherited "hovered" variant, no setState */}
         <motion.div
@@ -137,13 +140,13 @@ const Star = memo(
           whileTap={INNER_WHILE_TAP}
         />
 
-        {/* Label — visible when filtered, or when parent enters "hovered" variant */}
+        {/* Label — visible when filtered, or when parent is hovered */}
         <motion.span
           className="absolute top-full mt-1 select-none whitespace-nowrap text-center leading-none pointer-events-none"
           style={labelStyle}
           variants={LABEL_VARIANTS}
           initial="idle"
-          animate={isFilteredView ? "hovered" : "idle"}
+          animate={isFilteredView || isHovered ? "hovered" : "idle"}
           transition={LABEL_TRANSITION}
         >
           {isArabic ? surah.shortName : surah.englishName}

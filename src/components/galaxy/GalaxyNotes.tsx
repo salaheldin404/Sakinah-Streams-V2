@@ -42,7 +42,7 @@ interface GalaxyNotesProps {
 }
 
 const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
-  const t = useTranslations("QuranicGalaxy.NoteEditor");
+  const t = useTranslations("NoteEditor");
   const locale = useLocale();
   const isArabic = locale === "ar";
 
@@ -228,7 +228,7 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
           notes.map((note) => (
             <motion.div
               key={note.id}
-              layout
+              
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="group relative rounded-2xl p-4 transition-all duration-300"
@@ -285,7 +285,7 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
                       })}
                     </span>
 
-                    <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="flex gap-1 opacity-100 [@media(hover:hover)]:opacity-0 transition-opacity [@media(hover:hover)]:group-hover:opacity-100">
                       <Button
                         variant="ghost"
                         size="icon"
