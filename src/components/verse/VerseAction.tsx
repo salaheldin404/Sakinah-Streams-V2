@@ -7,7 +7,7 @@ import useIsSpecificReciter from "@/hooks/useIsSpecificReciter";
 import { Link } from "@/i18n/navigation";
 import { Verse } from "@/types/verse";
 import { useTranslations } from "next-intl";
-import { LuBookOpen, LuPlay, LuCopy } from "react-icons/lu";
+import { LuBookOpen, LuPlay, LuCopy, LuStickyNote } from "react-icons/lu";
 import { toast } from "sonner";
 
 interface VerseActionProps {
@@ -15,12 +15,14 @@ interface VerseActionProps {
   className?: string;
   onClickVerse: (verse: Verse) => void;
   onClickCopy: (verse: Verse) => void;
+  onClickNote?: (verse: Verse) => void;
 }
 const VerseAction = ({
   verse,
   className,
   onClickVerse,
   onClickCopy,
+  onClickNote,
 }: VerseActionProps) => {
   const t = useTranslations("VerseAction");
   const isSpecificReciter = useIsSpecificReciter();
@@ -64,6 +66,20 @@ const VerseAction = ({
           <p>{t("copy")}</p>
         </TooltipContent>
       </Tooltip>
+
+      {onClickNote && (
+        <Tooltip delayDuration={100}>
+          <TooltipTrigger
+            onClick={() => onClickNote(verse)}
+            className="cursor-pointer grid place-content-center w-8 h-8 rounded-full hover:bg-secondary transition-colors"
+          >
+            <LuStickyNote />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{t("notes")}</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
 
       <Tooltip delayDuration={100}>
         <TooltipTrigger

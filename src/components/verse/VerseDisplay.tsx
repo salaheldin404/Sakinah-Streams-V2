@@ -19,6 +19,7 @@ import {
 import { setClickedVerse, setSurahInfo } from "@/lib/store/slices/surah-slice";
 
 import VerseAction from "./VerseAction";
+import VerseNotesDialog from "./VerseNotesDialog";
 import { Surah } from "@/types/surah";
 import { useFont } from "@/hooks/useFont";
 
@@ -40,6 +41,7 @@ const VerseDisplay = memo(({ verse, surah, scrollId }: VerseDisplayProps) => {
 
   const { fontFamily, ayahNumberStyle } = useFont();
   const [isOpen, setIsOpen] = useState(false);
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
   // const [savedVerseActive, setSavedVerseActive] = useState(false);
   // const t = useTranslations("VerseAction");
 
@@ -97,7 +99,7 @@ const VerseDisplay = memo(({ verse, surah, scrollId }: VerseDisplayProps) => {
   //       }
   //     }, 150);
   //     return () => clearTimeout(timer);
-  //   }
+  //     }
   // }, [scrollId, handleRemoveQuery]);
 
   const handleOpenChange = useCallback((open: boolean) => {
@@ -161,9 +163,20 @@ const VerseDisplay = memo(({ verse, surah, scrollId }: VerseDisplayProps) => {
             verse={verse}
             onClickCopy={handleCopy}
             onClickVerse={handleClickVerse}
+            onClickNote={() => {
+              setIsOpen(false);
+              // close popover first, then open dialog on next tick
+              requestAnimationFrame(() => setIsNotesOpen(true));
+            }}
           />
         </PopoverContent>
       </Popover>
+
+      <VerseNotesDialog
+        verse={verse}
+        isOpen={isNotesOpen}
+        onOpenChange={setIsNotesOpen}
+      />
     </>
   );
 });
