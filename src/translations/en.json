@@ -129,7 +129,8 @@
     "tafsirs": "Tafsirs",
     "play": "Play",
     "no-play": "This verse has no audio. Use the play button at the top.",
-    "copy-message": "Verse has been copied to clipboard"
+    "copy-message": "Verse has been copied to clipboard",
+    "notes": "Notes"
   },
   "TafsirPage": {
     "next": "Next Ayah",
@@ -600,25 +601,7 @@
       "loading_chapter_info": "Loading chapter information...",
       "order": "Revelation Order"
     },
-    "NoteEditor": {
-      "title": "Notes",
-      "description": "Add your personal reflections, insights, or reminders about this Surah. Your notes will be saved and accessible whenever you explore this Surah in the Quranic Galaxy.",
-      "notePlaceholder": "Write your note here...",
-      "save": "Save Note",
-      "cancel": "Cancel",
-      "edit": "Edit Note",
-      "delete": "Delete Note",
-      "add": "Add Note",
-      "noNotes": "No notes for this Surah yet. Start by adding your first note!",
-      "confirmDelete": "Are you sure you want to delete this note? This action cannot be undone.",
-      "addSuccess": "Your note has been added successfully!",
-      "editSuccess": "Your note has been updated successfully!",
-      "deleteSuccess": "Your note has been deleted successfully!",
-      "error": "An error occurred while saving your note. Please try again.",
-      "deleteError": "An error occurred while deleting your note. Please try again.",
-      "addError": "An error occurred while adding your note. Please try again.",
-      "editError": "An error occurred while updating your note. Please try again."
-    },
+
     "Header": {
       "title": "Quranic Galaxy",
       "description": "Click on a star to explore its Surah details. Each star represents a Surah of the Quran."
@@ -670,5 +653,26 @@
     "delete_confirm_cancel": "Cancel",
     "limit_reached": "You've reached today's AI reflection limit 🌿 Please come back tomorrow or explore preset reflections.",
     "cooldown_active": "Please wait a few seconds before generating another reflection ⏳"
+  },
+  "NoteEditor": {
+    "title": "Notes",
+    "description": "Add your personal reflections, insights, or reminders about this Surah. Your notes will be saved and accessible whenever you explore this Surah in the Quranic Galaxy.",
+    "descriptionVerse": "Add your personal reflections, insights, or reminders about this verse.",
+    "notePlaceholder": "Write your note here...",
+    "save": "Save Note",
+    "cancel": "Cancel",
+    "edit": "Edit Note",
+    "delete": "Delete Note",
+    "add": "Add Note",
+    "noNotes": "No notes for this Surah yet. Start by adding your first note!",
+    "noNotesVerse": "No notes for this verse yet. Start by adding your first note!",
+    "confirmDelete": "Are you sure you want to delete this note? This action cannot be undone.",
+    "addSuccess": "Your note has been added successfully!",
+    "editSuccess": "Your note has been updated successfully!",
+    "deleteSuccess": "Your note has been deleted successfully!",
+    "error": "An error occurred while saving your note. Please try again.",
+    "deleteError": "An error occurred while deleting your note. Please try again.",
+    "addError": "An error occurred while adding your note. Please try again.",
+    "editError": "An error occurred while updating your note. Please try again."
   }
 }
