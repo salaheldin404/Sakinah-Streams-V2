@@ -176,7 +176,18 @@
     "verses": "Verses",
     "no-surahs": "No favorite surahs found",
     "no-reciters": "No favorite reciters found",
-    "no-verses": "No favorite verses found"
+    "no-verses": "No favorite verses found",
+    "notes": "Notes",
+    "no-notes": "No notes found",
+    "totalNotes": "Total Notes:",
+    "searchPlaceholder": "Search notes...",
+    "noSearchResults": "No search results found",
+    "surahLabel": "Surah {name}",
+    "surahVerseLabel": "Surah {name} (verse {verse})",
+    "surahVersesLabel": "Surah {name} (verses {verses})",
+    "nextPage": "Next Page",
+    "prevPage": "Previous Page",
+    "pageLabel": "Page {page}"
   },
   "Loading": {
     "loading": "Loading, please wait...",
@@ -674,5 +685,10 @@
     "deleteError": "An error occurred while deleting your note. Please try again.",
     "addError": "An error occurred while adding your note. Please try again.",
     "editError": "An error occurred while updating your note. Please try again."
-  }
+  },
+      "AuthRequired": {
+        "title": "Please Sign In",
+        "description": "You need to sign in to add and manage notes",
+        "signInButton": "Sign In"
+      }
 }
