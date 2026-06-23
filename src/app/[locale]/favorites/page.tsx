@@ -8,6 +8,8 @@ import { FaBook, FaBookReader } from "react-icons/fa";
 
 import SurahContent from "./_components/SurahContent";
 import ReciterContent from "./_components/ReciterContent";
+import NotesContent from "./_components/NotesContent";
+import { StickyNote } from "lucide-react";
 import { useEffect, useState } from "react";
 const FavoritesPage = () => {
   const [isClient, setIsClient] = useState(false);
@@ -28,7 +30,7 @@ const FavoritesPage = () => {
           defaultValue="surahs"
           className="w-full my-5"
         >
-          <TabsList className="grid w-full grid-cols-2 gap-4 h-auto rounded-0 mb-3 bg-white dark:bg-card">
+          <TabsList className="grid w-full grid-cols-3 gap-4 h-auto rounded-0 mb-3 bg-white dark:bg-card">
             <TabsTrigger
               value="surahs"
               className="flex items-center gap-2 cursor-pointer dark:bg-secondary bg-gray-100  dark:data-[state=active]:bg-primary data-[state=active]:bg-primary data-[state=active]:text-white py-3"
@@ -44,6 +46,13 @@ const FavoritesPage = () => {
               <FaBookReader className="h-4 w-4" />
               {t("reciters")}
             </TabsTrigger>
+            <TabsTrigger
+              value="notes"
+              className="flex items-center gap-2 cursor-pointer dark:bg-secondary bg-gray-100 dark:data-[state=active]:bg-primary data-[state=active]:bg-primary data-[state=active]:text-white py-3"
+            >
+              <StickyNote className="h-4 w-4" />
+              {t("notes")}
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="surahs">
             <SurahContent
@@ -56,6 +65,11 @@ const FavoritesPage = () => {
             <ReciterContent
               reciters={reciters}
               reciterText={t("no-reciters")}
+            />
+          </TabsContent>
+          <TabsContent value="notes">
+            <NotesContent
+              noNotesText={t("no-notes")}
             />
           </TabsContent>
         </Tabs>
