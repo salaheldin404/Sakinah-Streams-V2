@@ -8,9 +8,11 @@ import {
   useDeleteNoteMutation,
   useGetNoteByVerseQuery,
 } from "@/lib/store/features/notesApi";
+import { useAppSelector } from "@/lib/store/hooks";
 import { Note } from "@/types/note";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import AuthRequiredPrompt from "@/components/common/AuthRequiredPrompt";
 import {
   Plus,
   Pencil,
@@ -57,6 +59,7 @@ export default function VerseNotesDialog({
   const t = useTranslations("NoteEditor");
   const locale = useLocale();
   const isArabic = locale === "ar";
+  const isAuthenticated = useAppSelector((state) => state.sync.isAuthenticated);
 
   const [newNoteBody, setNewNoteBody] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -72,7 +75,7 @@ export default function VerseNotesDialog({
   const { data: notes = [], isLoading } = useGetNoteByVerseQuery(
     verse.verse_key,
     {
-      skip: !isOpen,
+      skip: !isOpen || !isAuthenticated,
       refetchOnMountOrArgChange: true,
     }
   );
@@ -181,6 +184,8 @@ export default function VerseNotesDialog({
           <div className="flex items-center justify-center p-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
+        ) : !isAuthenticated ? (
+          <AuthRequiredPrompt />
         ) : (
           <div className="space-y-4 mt-4">
             <div className="flex items-center justify-between">

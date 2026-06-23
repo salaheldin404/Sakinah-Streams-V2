@@ -19,7 +19,6 @@ import { createGlassStyle } from "@/lib/utils/galaxy";
 import StatCard from "./StatCard";
 import { Link } from "@/i18n/navigation";
 import GalaxyNotes from "./GalaxyNotes";
-import { useAppSelector } from "@/lib/store/hooks";
 
 interface GalaxySurahDetailsProps {
   selectedSurah: GalaxySurah | null;
@@ -79,7 +78,6 @@ const GalaxySurahDetails = ({
   const locale = useLocale();
   const isArabic = locale === "ar";
   const t = useTranslations("QuranicGalaxy.GalaxySurahDetails");
-  const user = useAppSelector((state) => state.sync.user);
   const params = new URLSearchParams({
     language: locale,
     include_resources: "true",
@@ -346,7 +344,7 @@ const GalaxySurahDetails = ({
           )}
 
           {/* Notes Section */}
-          {user && (
+          {/* {user && ( */}
             <motion.div
               variants={contentVariants}
               custom={0.45}
@@ -354,7 +352,7 @@ const GalaxySurahDetails = ({
             >
               <GalaxyNotes surah={selectedSurah} color={color} />
             </motion.div>
-          )}
+          
 
           {/* Resources */}
           {!!resources.length && (

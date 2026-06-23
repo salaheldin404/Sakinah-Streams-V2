@@ -8,15 +8,16 @@ import {
   useDeleteNoteMutation,
   useGetNoteByVerseQuery,
 } from "@/lib/store/features/notesApi";
+import { useAppSelector } from "@/lib/store/hooks";
 import { Note } from "@/types/note";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import AuthRequiredPrompt from "@/components/common/AuthRequiredPrompt";
 import {
   Plus,
   Pencil,
   Trash2,
   Save,
- 
   StickyNote,
   Loader2,
   AlertCircle,
@@ -45,6 +46,7 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
   const t = useTranslations("NoteEditor");
   const locale = useLocale();
   const isArabic = locale === "ar";
+  const isAuthenticated = useAppSelector((state) => state.sync.isAuthenticated);
 
   const [newNoteBody, setNewNoteBody] = useState("");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -57,7 +59,7 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
     `${surah.number}:1`,
     {
       refetchOnMountOrArgChange: true,
-    }
+    },
   );
 
   const [addNote, { isLoading: isAddingNote }] = useAddNoteMutation();
@@ -76,11 +78,9 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
 
       setNewNoteBody("");
       setIsAdding(false);
-      toast.success(
-       t("addSuccess") 
-      );
+      toast.success(t("addSuccess"));
     } catch (error) {
-      console.log(error,'error from add note');
+      console.log(error, "error from add note");
       toast.error(t("addError"));
     }
   };
@@ -96,11 +96,9 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
 
       setEditingNoteId(null);
       setEditBody("");
-      toast.success(
-        t("editSuccess")
-      );
+      toast.success(t("editSuccess"));
     } catch (error) {
-      console.log(error,'error from update note');
+      console.log(error, "error from update note");
       toast.error(t("editError"));
     }
   };
@@ -111,11 +109,9 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
     try {
       await deleteNote(noteToDelete).unwrap();
       setNoteToDelete(null);
-      toast.success(
-        t("deleteSuccess")
-      );
+      toast.success(t("deleteSuccess"));
     } catch (error) {
-      console.log(error,'error from delete note');
+      console.log(error, "error from delete note");
       toast.error(t("deleteError"));
     }
   };
@@ -130,6 +126,16 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
       <div className="flex items-center justify-center p-8">
         <Loader2 className="h-6 w-6 animate-spin" style={{ color }} />
       </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <AuthRequiredPrompt
+        showTitle={true}
+        color={color}
+        glassStyle={createGlassStyle(color)}
+      />
     );
   }
 
@@ -228,7 +234,6 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
           notes.map((note) => (
             <motion.div
               key={note.id}
-              
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="group relative rounded-2xl p-4 transition-all duration-300"
@@ -321,7 +326,7 @@ const GalaxyNotes = ({ surah, color }: GalaxyNotesProps) => {
             dir={isArabic ? "rtl" : "ltr"}
             className="rounded-3xl border-0 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-xl"
           >
-            <AlertDialogHeader >
+            <AlertDialogHeader>
               <div className="flex items-center gap-2 text-red-500 mb-2">
                 <AlertCircle size={20} />
                 <AlertDialogTitle>{t("delete")}</AlertDialogTitle>

@@ -1,14 +1,15 @@
+import { Pagination } from "@/types/paginate";
 import { qfApiSlice } from "../services/qfApiSlice";
 import type { Note, NoteInput } from "@/types/note";
 export const notesApi = qfApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getAllNotes: builder.query({
-      query: (params?: string) => `/v1/notes?${params}`,
-      transformResponse: (response: { data: Note[] }) => response.data,
+    getAllNotes: builder.query<{ data: Note[]; pagination: Pagination }, string | undefined>({
+      query: (params?: string) => `/v1/notes?${params ?? ""}`,
+      transformResponse: (response: { data: Note[]; pagination: Pagination }) => response,
       providesTags: (result) =>
-        result
+        result?.data
           ? [
-              ...result.map(({ id }) => ({ type: "Note" as const, id })),
+              ...result.data.map(({ id }) => ({ type: "Note" as const, id })),
               { type: "Note", id: "LIST" },
             ]
           : [{ type: "Note", id: "LIST" }],
