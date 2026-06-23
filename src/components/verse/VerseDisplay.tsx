@@ -171,12 +171,13 @@ const VerseDisplay = memo(({ verse, surah, scrollId }: VerseDisplayProps) => {
           />
         </PopoverContent>
       </Popover>
-
-      <VerseNotesDialog
-        verse={verse}
-        isOpen={isNotesOpen}
-        onOpenChange={setIsNotesOpen}
-      />
+      
+        <VerseNotesDialog
+          verse={verse}
+          isOpen={isNotesOpen}
+          onOpenChange={setIsNotesOpen}
+        />
+     
     </>
   );
 });
