@@ -503,6 +503,7 @@
       "subtitle": "Visualize your daily commitment to the Holy Qur'an",
       "pages": "{count} pages",
       "minutes": "{count} minutes",
+      "seconds": "{count} seconds",
 
       "lightReading": "Light Reading",
       "moderateReading": "Moderate Reading",

@@ -507,6 +507,7 @@
       "subtitle": "تصور لالتزامك اليومي بالقرآن الكريم",
       "pages": "{count} صفحة",
       "minutes": "{count} دقيقة",
+      "seconds": "{count} ثانية", 
       "lightReading": "قراءة خفيفة",
       "moderateReading": "قراءة متوسطة",
       "deepReading": "قراءة مكثفة",

@@ -66,7 +66,9 @@ export function ActivityHeatmap({ stats, yearSetting }: ActivityHeatmapProps) {
   //   ? DateTime.now().toJSDate()
   //   : DateTime.fromISO(`${yearSetting.selectedYear}-12-31`).toJSDate();
 
-  const endDate = DateTime.fromISO(`${yearSetting.selectedYear}-12-31`).toJSDate();
+  const endDate = DateTime.fromISO(
+    `${yearSetting.selectedYear}-12-31`,
+  ).toJSDate();
 
   const heatmapDataMap = useMemo(() => {
     return new Map(stats.heatmapData.map((d) => [d.date, d]));
@@ -114,7 +116,7 @@ export function ActivityHeatmap({ stats, yearSetting }: ActivityHeatmapProps) {
                 const dateLabel = DateTime.fromFormat(data.date, "yyyy/M/d")
                   .setLocale(locale)
                   .toLocaleString(DateTime.DATE_MED);
-              
+
                 const pages = dayData?.pages || 0;
 
                 let intensityLabel = t("noReading");
@@ -154,12 +156,21 @@ export function ActivityHeatmap({ stats, yearSetting }: ActivityHeatmapProps) {
                         <div className="font-bold text-sm">{dateLabel}</div>
                         <div className="flex items-center gap-2 text-xs">
                           <span className="text-emerald-500 font-bold">
-                            📖 {t("pages", { count: dayData?.pages.toFixed(0) || 0 })}
+                            📖{" "}
+                            {t("pages", {
+                              count: dayData?.pages.toFixed(0) || 0,
+                            })}
                           </span>
                           <span className="text-muted-foreground">•</span>
                           <span className="text-emerald-500 font-bold">
                             ⏱️ {t("minutes", { count: dayData?.minutes || 0 })}
                           </span>
+                          <span className="text-muted-foreground">•</span>
+                          {dayData?.seconds && (
+                            <span className="text-emerald-500 font-bold">
+                              {t("seconds", { count: dayData.seconds })}
+                            </span>
+                          )}
                         </div>
 
                         <div className="text-xs text-muted-foreground">
