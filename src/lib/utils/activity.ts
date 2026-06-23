@@ -17,6 +17,7 @@ export interface JourneyStats {
     count: number;
     pages: number;
     minutes: number;
+    seconds: number;
   }[];
   achievements: {
     id: string;
@@ -294,6 +295,7 @@ export function calculateJourneyStats(
     .map(({ seconds, ...rest }) => ({
       ...rest,
       minutes: Math.floor(seconds / 60),
+      seconds: seconds % 60,
     }));
 
   const sortedDates = Array.from(activityDates)
